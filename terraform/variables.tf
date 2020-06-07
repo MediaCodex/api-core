@@ -1,6 +1,6 @@
 locals {
   environment = "${lookup(var.environments, terraform.workspace, "dev")}"
-  domain = lookup(var.domains, local.environment)
+  domain      = lookup(var.domains, local.environment)
 }
 
 variable "environments" {
