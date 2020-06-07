@@ -33,3 +33,8 @@ resource "aws_cognito_user_pool" "default" {
 
   tags = var.default_tags
 }
+
+output "cognito_pool" {
+  value       = aws_cognito_user_pool.default.id
+  description = "Cognito User Pool ID"
+}
