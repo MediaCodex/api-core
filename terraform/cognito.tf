@@ -2,10 +2,10 @@ resource "aws_cognito_user_pool" "default" {
   name = "mediacodex"
 
   // Email
+  // NOTE: this will need to be deployed twice due to the email verification
   email_configuration {
     email_sending_account = "DEVELOPER"
-    source_arn            = aws_ses_domain_identity.default.arn
-    //from_email_address    = "noreply@${local.domain}"
+    source_arn            = aws_ses_email_identity.noreply.arn
   }
 
   // Devices

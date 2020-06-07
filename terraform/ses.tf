@@ -1,6 +1,11 @@
 resource "aws_ses_domain_identity" "default" {
   domain = local.domain
 }
+resource "aws_ses_email_identity" "noreply" {
+  provider = aws.eu-west-1
+  email = "noreply@${local.domain}"
+}
+
 
 /*
  * Verification
