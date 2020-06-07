@@ -34,3 +34,7 @@ provider "aws" {
     role_arn = var.deploy_aws_roles[local.environment]
   }
 }
+
+provider "cloudflare" {
+  version = "~> 2.0"
+}
