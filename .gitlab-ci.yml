@@ -1,3 +1,11 @@
 include:
   - remote: 'https://gitlab.com/mediacodex/infrastructure/-/raw/master/gitlab/terraform.yml'
   - remote: 'https://gitlab.com/mediacodex/infrastructure/-/raw/master/gitlab/sonarcloud.yml'
+
+.variables_prod: &variables_prod
+  variables:
+    CLOUDFLARE_API_TOKEN: $CLOUDFLARE_API_TOKEN_prod
+
+.variables_dev: &variables_dev
+  variables:
+    CLOUDFLARE_API_TOKEN: $CLOUDFLARE_API_TOKEN_dev
