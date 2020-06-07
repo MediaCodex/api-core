@@ -1,7 +1,7 @@
 // NOTE: there are some records kept in other files so that they can more tightly
 // grouped with their use-case, e.g. SES verification
 resource "cloudflare_zone" "main" {
-  zone = var.domain
+  zone = local.domain
 }
 
 /*

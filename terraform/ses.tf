@@ -1,5 +1,5 @@
 resource "aws_ses_domain_identity" "default" {
-  domain = var.domain
+  domain = local.domain
 }
 
 /*

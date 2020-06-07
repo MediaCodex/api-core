@@ -1,5 +1,6 @@
 locals {
   environment = "${lookup(var.environments, terraform.workspace, "dev")}"
+  domain = lookup(var.domains, local.environment)
 }
 
 variable "environments" {
@@ -23,5 +24,13 @@ variable "terraform_state" {
   default = {
     bucket = "arn:aws:s3:::terraform-state-mediacodex"
     dynamo = "arn:aws:dynamodb:eu-central-1:939514526661:table/terraform-state-lock"
+  }
+}
+
+variable "domains" {
+  type = map
+  default = {
+    dev  = "mediacodex.dev"
+    prod = "mediacodex.net"
   }
 }
