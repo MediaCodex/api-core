@@ -35,6 +35,16 @@ provider "aws" {
   }
 }
 
+provider "aws" {
+  alias               = "eu_west_1"
+  version             = "~> 2.0"
+  region              = "eu-west-1"
+  allowed_account_ids = var.deploy_aws_accounts[local.environment]
+  assume_role {
+    role_arn = var.deploy_aws_roles[local.environment]
+  }
+}
+
 provider "cloudflare" {
   version = "~> 2.0"
 }
