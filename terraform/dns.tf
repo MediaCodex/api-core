@@ -41,3 +41,10 @@ resource "cloudflare_record" "website" {
   value    = "${local.domain}.s3-website.eu-central-1.amazonaws.com"
   proxied  = true
 }
+resource "cloudflare_record" "website_www" {
+  zone_id  = cloudflare_zone.main.id
+  name     = "www"
+  type     = "CNAME"
+  value    = "@"
+  proxied  = true
+}
