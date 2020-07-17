@@ -45,6 +45,6 @@ resource "cloudflare_record" "website_www" {
   zone_id  = cloudflare_zone.main.id
   name     = "www"
   type     = "CNAME"
-  value    = "@"
+  value    = cloudflare_record.website.hostname
   proxied  = true
 }
