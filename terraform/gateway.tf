@@ -1,14 +1,15 @@
-resource "aws_api_gateway_rest_api" "default" {
+resource "aws_apigatewayv2_api" "default" {
   name = "mediacodex"
+  protocol_type = "HTTP"
   tags = var.default_tags
 }
 
 output "gateway_id" {
-  value       = aws_api_gateway_rest_api.default.id
+  value       = aws_apigatewayv2_api.default.id
   description = "ID for primary API Gateway"
 }
 
-output "gateway_root" {
-  value       = aws_api_gateway_rest_api.default.root_resource_id
-  description = "Root resource of primary API Gateway"
+output "gateway_execution" {
+  value       = aws_apigatewayv2_api.default.execution_arn
+  description = "Invoke ARN of primary API Gateway"
 }
