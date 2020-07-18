@@ -36,7 +36,7 @@ variable "domains" {
 }
 
 variable "first_deploy" {
-  type = bool
+  type        = bool
   description = "Disables some resources that depend on other services being deployed"
-  default = false
+  default     = false
 }

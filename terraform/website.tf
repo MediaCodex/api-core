@@ -2,7 +2,7 @@
  * DNS
  */
 resource "cloudflare_record" "website" {
-  count = var.first_deploy == true ? 0 : 1
+  count   = var.first_deploy == true ? 0 : 1
   zone_id = cloudflare_zone.main.id
   name    = "@"
   type    = "CNAME"
@@ -11,7 +11,7 @@ resource "cloudflare_record" "website" {
 }
 
 resource "cloudflare_record" "website_www" {
-  count = var.first_deploy == true ? 0 : 1
+  count   = var.first_deploy == true ? 0 : 1
   zone_id = cloudflare_zone.main.id
   name    = "www"
   type    = "CNAME"
@@ -23,7 +23,7 @@ resource "cloudflare_record" "website_www" {
  * Origin Cert
  */
 resource "aws_acm_certificate" "website" {
-  provider = aws.us_east_1
+  provider          = aws.us_east_1
   domain_name       = local.domain
   validation_method = "DNS"
 
@@ -43,7 +43,7 @@ resource "cloudflare_record" "website_cert" {
 }
 
 resource "aws_acm_certificate_validation" "website" {
-  provider = aws.us_east_1
+  provider                = aws.us_east_1
   certificate_arn         = aws_acm_certificate.website.arn
   validation_record_fqdns = [cloudflare_record.website_cert.hostname]
 }

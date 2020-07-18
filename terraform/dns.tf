@@ -6,10 +6,10 @@ resource "cloudflare_zone" "main" {
 resource "cloudflare_zone_settings_override" "main" {
   zone_id = cloudflare_zone.main.id
   settings {
-    ssl = "strict"
-    tls_1_3 = "on"
-    min_tls_version = "1.2"
-    always_use_https = "on"
+    ssl                      = "strict"
+    tls_1_3                  = "on"
+    min_tls_version          = "1.2"
+    always_use_https         = "on"
     automatic_https_rewrites = "on"
   }
 }
