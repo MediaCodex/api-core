@@ -34,3 +34,9 @@ variable "domains" {
     prod = "mediacodex.net"
   }
 }
+
+variable "first_deploy" {
+  type = bool
+  description = "Disables some resources that depend on other services being deployed"
+  default = false
+}
