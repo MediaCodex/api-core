@@ -35,16 +35,16 @@ resource "cloudflare_record" "webmail_spf" {
  * Website
  */
 resource "cloudflare_record" "website" {
-  zone_id  = cloudflare_zone.main.id
-  name     = "@"
-  type     = "CNAME"
-  value    = "${local.domain}.s3-website.eu-central-1.amazonaws.com"
-  proxied  = true
+  zone_id = cloudflare_zone.main.id
+  name    = "@"
+  type    = "CNAME"
+  value   = "${local.domain}.s3-website.eu-central-1.amazonaws.com"
+  proxied = true
 }
 resource "cloudflare_record" "website_www" {
-  zone_id  = cloudflare_zone.main.id
-  name     = "www"
-  type     = "CNAME"
-  value    = cloudflare_record.website.hostname
-  proxied  = true
+  zone_id = cloudflare_zone.main.id
+  name    = "www"
+  type    = "CNAME"
+  value   = cloudflare_record.website.hostname
+  proxied = true
 }
