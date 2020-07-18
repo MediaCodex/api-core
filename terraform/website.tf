@@ -6,7 +6,7 @@ resource "cloudflare_record" "website" {
   zone_id = cloudflare_zone.main.id
   name    = "@"
   type    = "CNAME"
-  value   = "${local.domain}.s3-website.eu-central-1.amazonaws.com"
+  value   = data.terraform_remote_state.website.outputs.cloudfront_domain
   proxied = true
 }
 

@@ -58,3 +58,15 @@ provider "aws" {
 provider "cloudflare" {
   version = "~> 2.0"
 }
+
+data "terraform_remote_state" "website" {
+  backend   = "s3"
+  workspace = terraform.workspace
+  config = {
+    bucket       = "terraform-state-mediacodex"
+    key          = "website.tfstate"
+    region       = "eu-central-1"
+    role_arn     = "arn:aws:iam::939514526661:role/remotestate/core"
+    session_name = "terraform"
+  }
+}
