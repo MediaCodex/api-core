@@ -49,3 +49,19 @@ variable "firebase_projects" {
     "prod" = "mediacodex-prod"
   }
 }
+
+variable "cors_origins" {
+  type = map(list(string))
+  default = {
+    dev  = ["*"]
+    prod = ["https://mediacodex.net"]
+  }
+}
+
+variable "cors_expose" {
+  type = map(list(string))
+  default = {
+    dev  = ["*"]
+    prod = []
+  }
+}

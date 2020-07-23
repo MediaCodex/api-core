@@ -4,7 +4,15 @@
 resource "aws_apigatewayv2_api" "default" {
   name          = "mediacodex"
   protocol_type = "HTTP"
-  tags          = var.default_tags
+
+  cors_configuration {
+    allow_headers  = ["*"]
+    allow_methods  = ["*"]
+    allow_origins  = lookup(var.cors_origins, local.environment)
+    expose_headers = lookup(var.cors_expose, local.environment)
+  }
+
+  tags = var.default_tags
 }
 
 resource "aws_apigatewayv2_stage" "v1" {
