@@ -20,6 +20,18 @@ resource "aws_apigatewayv2_stage" "v1" {
   tags = var.default_tags
 }
 
+resource "aws_apigatewayv2_authorizer" "firebase" {
+  api_id           = aws_apigatewayv2_api.default.id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  name             = "firebase"
+
+  jwt_configuration {
+    issuer   = "https://securetoken.google.com/${local.firebase_project}"
+    audience = [local.firebase_project]
+  }
+}
+
 /*
  * Domain
  */
@@ -93,4 +105,9 @@ output "gateway_id" {
 output "gateway_execution" {
   value       = aws_apigatewayv2_api.default.execution_arn
   description = "Invoke ARN of primary API Gateway"
+}
+
+output "authorizer_firebase" {
+  value       = aws_apigatewayv2_authorizer.firebase.id
+  description = "ID for firebase authorizer"
 }

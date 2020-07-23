@@ -1,6 +1,7 @@
 locals {
-  environment = "${lookup(var.environments, terraform.workspace, "dev")}"
-  domain      = lookup(var.domains, local.environment)
+  environment      = "${lookup(var.environments, terraform.workspace, "dev")}"
+  domain           = lookup(var.domains, local.environment)
+  firebase_project = lookup(var.firebase_projects, local.environment)
 }
 
 variable "environments" {
@@ -39,4 +40,12 @@ variable "first_deploy" {
   type        = bool
   description = "Disables some resources that depend on other services being deployed"
   default     = false
+}
+
+variable "firebase_projects" {
+  type = map(string)
+  default = {
+    "dev"  = "mediacoex-dev"
+    "prod" = "mediacodex-prod"
+  }
 }
