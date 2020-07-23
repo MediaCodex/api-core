@@ -107,7 +107,7 @@ output "gateway_execution" {
   description = "Invoke ARN of primary API Gateway"
 }
 
-output "authorizer_firebase" {
+output "authorizer" {
   value       = aws_apigatewayv2_authorizer.firebase.id
   description = "ID for firebase authorizer"
 }
