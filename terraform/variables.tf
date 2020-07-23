@@ -45,7 +45,7 @@ variable "first_deploy" {
 variable "firebase_projects" {
   type = map(string)
   default = {
-    "dev"  = "mediacoex-dev"
+    "dev"  = "mediacodex-dev"
     "prod" = "mediacodex-prod"
   }
 }
