@@ -112,7 +112,7 @@ output "gateway_id" {
 
 output "gateway_execution" {
   value       = aws_apigatewayv2_api.default.execution_arn
-  description = "Invoke ARN of primary API Gateway"
+  description = "Execution ARN of primary API Gateway"
 }
 
 output "authorizer" {
