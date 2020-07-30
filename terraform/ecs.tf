@@ -3,6 +3,7 @@
  */
 resource "aws_ecs_cluster" "api" {
   name = "api"
+  capacity_providers = [aws_ecs_capacity_provider.api.name]
   tags = var.default_tags
 }
 
