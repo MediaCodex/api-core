@@ -17,45 +17,106 @@ data "aws_ami" "amazon_linux_ecs" {
   }
 }
 
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
 resource "aws_launch_template" "ecs_api" {
   name_prefix   = "ecs-api"
-  image_id      = data.aws_ami.amazon_linux_ecs.id
   instance_type = "t3a.micro"
+  image_id      = data.aws_ami.amazon_linux_ecs.id
+
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.ecs.arn
+  }
+
+  # ebs {
+  #   delete_on_termination = true
+  #   volume_type = "gp2"
+  #   volume_size = 30
+  # }
+
+  monitoring {
+    enabled = true
+  }
 
   instance_market_options {
     market_type = "spot"
   }
 
   credit_specification {
-    cpu_credits = "standard"
+    cpu_credits = "unlimited"
   }
 
   tags = var.default_tags
 }
 
-resource "aws_autoscaling_group" "ecs_api" {
-  vpc_zone_identifier   = [for subnet in aws_subnet.ecs_api : subnet.id]
-  protect_from_scale_in = true
+resource "aws_iam_instance_profile" "ecs" {
+  name = "ecs"
+  role = aws_iam_role.ecs_instance.name
+}
 
-  // capacity
-  desired_capacity = local.environment == "prod" ? 2 : 1
-  max_size         = local.environment == "prod" ? 6 : 2
-  min_size         = local.environment == "prod" ? 2 : 1
+resource "aws_iam_role" "ecs_instance" {
+  name               = "ecs-instance"
+  assume_role_policy = data.aws_iam_policy_document.assume_ec2.json
+}
 
-  launch_template {
-    id      = aws_launch_template.ecs_api.id
-    version = "$Latest"
+resource "aws_iam_role_policy_attachment" "ecs_instance" {
+  role       = aws_iam_role.ecs_instance.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+data "aws_iam_policy_document" "assume_ec2" {
+  statement {
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+/*
+ * Spot fleet
+ */
+resource "aws_spot_fleet_request" "ecs_api" {
+  spot_price          = "0.03"
+  fleet_type          = "maintain"
+  allocation_strategy = "lowestPrice"
+  iam_fleet_role      = aws_iam_role.ecs_spot_fleet.arn
+  target_capacity     = lookup(var.ecs_capacity, local.environment)
+
+
+  launch_template_config {
+    launch_template_specification {
+      id      = aws_launch_template.ecs_api.id
+      version = aws_launch_template.ecs_api.latest_version
+    }
+
+    dynamic "overrides" {
+      for_each = aws_subnet.ecs_api
+      content {
+        subnet_id = overrides.value.id
+      }
+    }
   }
 
-  // auto-added by ECS, causing a difference to be detected
-  tag {
-    key                 = "AmazonECSManaged"
-    value               = true
-    propagate_at_launch = true
+  tags = var.default_tags
+}
+
+resource "aws_iam_role" "ecs_spot_fleet" {
+  name               = "ecs-spot-fleet"
+  assume_role_policy = data.aws_iam_policy_document.assume_spot_fleet.json
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_spot_fleet" {
+  role       = aws_iam_role.ecs_spot_fleet.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole"
+}
+
+data "aws_iam_policy_document" "assume_spot_fleet" {
+  statement {
+    principals {
+      type        = "Service"
+      identifiers = ["spotfleet.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
   }
 }
 
@@ -82,4 +143,8 @@ resource "aws_subnet" "ecs_api" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = var.default_tags
+}
+
+data "aws_availability_zones" "available" {
+  state = "available"
 }

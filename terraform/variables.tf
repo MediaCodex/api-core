@@ -42,6 +42,15 @@ variable "first_deploy" {
   default     = false
 }
 
+variable "ecs_capacity" {
+  type        = map(number)
+  description = "Target capacity for API spot fleet"
+  default = {
+    dev  = 2
+    prod = 5
+  }
+}
+
 variable "firebase_projects" {
   type = map(string)
   default = {
