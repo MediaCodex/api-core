@@ -27,7 +27,7 @@ variable "deploy_aws_accounts" {
 }
 
 provider "aws" {
-  version             = "~> 2.0"
+  version             = "~> 3.0"
   region              = "eu-central-1"
   allowed_account_ids = var.deploy_aws_accounts[local.environment]
   assume_role {
@@ -37,7 +37,7 @@ provider "aws" {
 
 provider "aws" {
   alias               = "eu_west_1"
-  version             = "~> 2.0"
+  version             = "~> 3.0"
   region              = "eu-west-1"
   allowed_account_ids = var.deploy_aws_accounts[local.environment]
   assume_role {
@@ -47,7 +47,7 @@ provider "aws" {
 
 provider "aws" {
   alias               = "us_east_1"
-  version             = "~> 2.0"
+  version             = "~> 3.0"
   region              = "us-east-1"
   allowed_account_ids = var.deploy_aws_accounts[local.environment]
   assume_role {
