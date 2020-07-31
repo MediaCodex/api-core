@@ -16,12 +16,12 @@ resource "aws_ecs_cluster" "api" {
  * Service Map
  */
 resource "aws_service_discovery_private_dns_namespace" "ecs_api" {
-  name = "esc-api.mediacodex.local"
+  name = "${local.api_cluster_name}.mediacodex.local"
   vpc  = aws_vpc.ecs_api.id
 }
 
 resource "aws_service_discovery_service" "ecs_api" {
-  name = "api"
+  name = local.api_cluster_name
 
   dns_config {
     namespace_id = aws_service_discovery_private_dns_namespace.ecs_api.id
@@ -48,7 +48,7 @@ resource "aws_service_discovery_service" "ecs_api" {
  * Outputs
  */
 output "ecs_api_discovery" {
-  value = aws_service_discovery_service.ecs_api.id
+  value = aws_service_discovery_service.ecs_api.arn
 }
 
 output "ecs_api_cluster" {
