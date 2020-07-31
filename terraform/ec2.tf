@@ -26,10 +26,6 @@ resource "aws_launch_template" "ecs_api" {
     cluster = local.api_cluster_name
   }))
 
-  vpc_security_group_ids = [
-    aws_security_group.ecs_api.id
-  ]
-
   iam_instance_profile {
     arn = aws_iam_instance_profile.ecs.arn
   }
@@ -46,6 +42,9 @@ resource "aws_launch_template" "ecs_api" {
 
   network_interfaces {
     associate_public_ip_address = true
+    security_groups = [
+      aws_security_group.ecs_api.id
+    ]
   }
 
   instance_market_options {
