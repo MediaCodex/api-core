@@ -37,24 +37,24 @@ resource "aws_acm_certificate" "website" {
 resource "cloudflare_record" "website_cert" {
   for_each = {
     for dvo in aws_acm_certificate.website.domain_validation_options : dvo.domain_name => {
-      resource_record_name   = dvo.resource_record_name
+      resource_record_name  = dvo.resource_record_name
       resource_record_value = dvo.resource_record_value
-      resource_record_type   = dvo.resource_record_type
+      resource_record_type  = dvo.resource_record_type
     }
   }
 
   zone_id = cloudflare_zone.main.id
   proxied = false
 
-  name    = each.value.resource_record_name
-  type    = each.value.resource_record_type
-  value   = trimsuffix(each.value.resource_record_value, ".")
+  name  = each.value.resource_record_name
+  type  = each.value.resource_record_type
+  value = trimsuffix(each.value.resource_record_value, ".")
 }
 
 resource "aws_acm_certificate_validation" "website" {
   provider                = aws.us_east_1
   certificate_arn         = aws_acm_certificate.website.arn
-  validation_record_fqdns = [for record in cloudflare_record.website_cert: record.hostname]
+  validation_record_fqdns = [for record in cloudflare_record.website_cert : record.hostname]
 }
 
 /*
