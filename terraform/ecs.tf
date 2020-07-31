@@ -28,11 +28,6 @@ resource "aws_service_discovery_service" "ecs_api" {
 
     dns_records {
       ttl  = 10
-      type = "A"
-    }
-
-    dns_records {
-      ttl  = 10
       type = "SRV"
     }
 
