@@ -2,7 +2,7 @@
  * ECS
  */
 resource "aws_ecs_cluster" "api" {
-  name = "api"
+  name = local.api_cluster_name
 
   setting {
     name  = "containerInsights"

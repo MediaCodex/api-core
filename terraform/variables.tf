@@ -2,6 +2,7 @@ locals {
   environment      = "${lookup(var.environments, terraform.workspace, "dev")}"
   domain           = lookup(var.domains, local.environment)
   firebase_project = lookup(var.firebase_projects, local.environment)
+  api_cluster_name = "${local.environment}-api"
 }
 
 variable "environments" {
