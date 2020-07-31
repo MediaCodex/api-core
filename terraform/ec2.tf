@@ -26,6 +26,10 @@ resource "aws_launch_template" "ecs_api" {
     cluster = local.api_cluster_name
   }))
 
+  vpc_security_group_ids = [
+    aws_security_group.ecs_api.id
+  ]
+
   iam_instance_profile {
     arn = aws_iam_instance_profile.ecs.arn
   }
@@ -78,6 +82,21 @@ data "aws_iam_policy_document" "assume_ec2" {
     }
     actions = ["sts:AssumeRole"]
   }
+}
+
+resource "aws_security_group" "ecs_api" {
+  name        = "ecs-api"
+  description = "Allow outbound only"
+  vpc_id      = aws_vpc.ecs_api.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = var.default_tags
 }
 
 /*
