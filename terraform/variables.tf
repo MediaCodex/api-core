@@ -1,16 +1,13 @@
 locals {
-  environment      = "${lookup(var.environments, terraform.workspace, "dev")}"
+  environment      = contains(var.environments, terraform.workspace) ? terraform.workspace : "dev"
   domain           = lookup(var.domains, local.environment)
   firebase_project = lookup(var.firebase_projects, local.environment)
   api_cluster_name = "${local.environment}-api"
 }
 
 variable "environments" {
-  type = map(string)
-  default = {
-    development = "dev"
-    production  = "prod"
-  }
+  type = set(string)
+  default = ["dev", "prod"]
 }
 
 variable "default_tags" {

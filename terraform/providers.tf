@@ -1,12 +1,11 @@
 terraform {
-  backend "s3" {
-    bucket         = "terraform-state-mediacodex"
-    key            = "core.tfstate"
-    region         = "eu-central-1"
-    encrypt        = true
-    dynamodb_table = "terraform-state-lock"
-    role_arn       = "arn:aws:iam::939514526661:role/remotestate/core"
-    session_name   = "terraform"
+  backend "remote" {
+    hostname = "app.terraform.io"
+    organization = "MediaCodex"
+
+    workspaces {
+      prefix = "service-core-"
+    }
   }
 }
 
