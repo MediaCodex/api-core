@@ -26,7 +26,6 @@ variable "deploy_aws_accounts" {
 }
 
 provider "aws" {
-  version             = "~> 3.0"
   region              = "eu-central-1"
   allowed_account_ids = var.deploy_aws_accounts[local.environment]
   assume_role {
@@ -36,7 +35,6 @@ provider "aws" {
 
 provider "aws" {
   alias               = "eu_west_1"
-  version             = "~> 3.0"
   region              = "eu-west-1"
   allowed_account_ids = var.deploy_aws_accounts[local.environment]
   assume_role {
@@ -46,7 +44,6 @@ provider "aws" {
 
 provider "aws" {
   alias               = "us_east_1"
-  version             = "~> 3.0"
   region              = "us-east-1"
   allowed_account_ids = var.deploy_aws_accounts[local.environment]
   assume_role {
@@ -54,18 +51,14 @@ provider "aws" {
   }
 }
 
-provider "cloudflare" {
-  version = "~> 2.0"
-}
+provider "cloudflare" {}
 
 data "terraform_remote_state" "website" {
-  backend   = "s3"
-  workspace = terraform.workspace
+  backend   = "remote"
   config = {
-    bucket       = "terraform-state-mediacodex"
-    key          = "website.tfstate"
-    region       = "eu-central-1"
-    role_arn     = "arn:aws:iam::939514526661:role/remotestate/core"
-    session_name = "terraform"
+    organization = "MediaCodex"
+    workspaces = {
+      name = "website-${local.environment}"
+    }
   }
 }
