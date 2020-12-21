@@ -31,7 +31,7 @@ resource "aws_launch_template" "ecs_api" {
   }
 
   monitoring {
-    enabled = true
+    enabled = false # this shit's expensive.
   }
 
   # ebs {
