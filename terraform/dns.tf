@@ -3,6 +3,7 @@
 resource "cloudflare_zone" "main" {
   zone = local.domain
 }
+
 resource "cloudflare_zone_settings_override" "main" {
   zone_id = cloudflare_zone.main.id
   settings {
@@ -14,7 +15,7 @@ resource "cloudflare_zone_settings_override" "main" {
   }
 }
 
-/*
+/**
  * Webmail
  */
 resource "cloudflare_record" "webmail_mx10" {
@@ -25,6 +26,7 @@ resource "cloudflare_record" "webmail_mx10" {
   ttl      = 10800
   priority = 10
 }
+
 resource "cloudflare_record" "webmail_mx50" {
   zone_id  = cloudflare_zone.main.id
   name     = "@"
@@ -33,10 +35,21 @@ resource "cloudflare_record" "webmail_mx50" {
   ttl      = 10800
   priority = 50
 }
+
 resource "cloudflare_record" "webmail_spf" {
   zone_id = cloudflare_zone.main.id
   name    = "@"
   type    = "TXT"
   value   = "v=spf1 include:_mailcust.gandi.net include:amazonses.com ~all"
   ttl     = 10800
+}
+
+/**
+ * SSM Outputs
+ */
+resource "aws_ssm_parameter" "dns_zone" {
+  name  = "/cloudflare-zones/main"
+  type  = "String"
+  value = cloudflare_zone.main.id
+  tags  = var.default_tags
 }
