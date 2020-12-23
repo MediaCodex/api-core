@@ -52,3 +52,13 @@ resource "aws_acm_certificate" "api" {
   certificate_body  = cloudflare_origin_ca_certificate.api.certificate
   certificate_chain = file("../cloudflare_origin_root_ca.pem")
 }
+
+/**
+ * SSM Outputs
+ */
+resource "aws_ssm_parameter" "gateway_public_domain" {
+  name  = "/gateway_public/domain"
+  type  = "String"
+  value = aws_apigatewayv2_domain_name.default.id
+  tags  = var.default_tags
+}
