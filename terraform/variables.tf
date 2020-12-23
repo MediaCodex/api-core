@@ -5,17 +5,12 @@ locals {
   api_cluster_name = "${local.environment}-api"
 }
 
+/**
+ * Terraform
+ */
 variable "environments" {
   type = set(string)
   default = ["dev", "prod"]
-}
-
-variable "default_tags" {
-  type        = map(string)
-  description = "Common resource tags for all resources"
-  default = {
-    Service = "core"
-  }
 }
 
 variable "terraform_state" {
@@ -23,6 +18,17 @@ variable "terraform_state" {
   default = {
     bucket = "arn:aws:s3:::terraform-state-mediacodex"
     dynamo = "arn:aws:dynamodb:eu-central-1:939514526661:table/terraform-state-lock"
+  }
+}
+
+/**
+ * AWS
+ */
+variable "default_tags" {
+  type        = map(string)
+  description = "Common resource tags for all resources"
+  default = {
+    Service = "core"
   }
 }
 
@@ -34,12 +40,9 @@ variable "domains" {
   }
 }
 
-variable "first_deploy" {
-  type        = bool
-  description = "Disables some resources that depend on other services being deployed"
-  default     = false
-}
-
+/**
+ * ECS
+ */
 variable "ecs_capacity" {
   type        = map(number)
   description = "Target capacity for API spot fleet"
@@ -49,6 +52,9 @@ variable "ecs_capacity" {
   }
 }
 
+/**
+ * Firebase
+ */
 variable "firebase_projects" {
   type = map(string)
   default = {
@@ -57,18 +63,11 @@ variable "firebase_projects" {
   }
 }
 
-variable "cors_origins" {
-  type = map(list(string))
-  default = {
-    dev  = ["*"]
-    prod = ["https://mediacodex.net"]
-  }
-}
-
-variable "cors_expose" {
-  type = map(list(string))
-  default = {
-    dev  = ["*"]
-    prod = []
-  }
+/**
+ * Toggles
+ */
+variable "first_deploy" {
+  type        = bool
+  description = "Disables some resources that depend on other services being deployed"
+  default     = false
 }
