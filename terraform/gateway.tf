@@ -57,7 +57,7 @@ resource "aws_acm_certificate" "api" {
  * SSM Outputs
  */
 resource "aws_ssm_parameter" "gateway_public_domain" {
-  name  = "/gateway_public/domain"
+  name  = "/gateway-public/domain"
   type  = "String"
   value = aws_apigatewayv2_domain_name.default.id
   tags  = var.default_tags
