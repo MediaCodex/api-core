@@ -1,4 +1,4 @@
-/*
+/**
  * ECS
  */
 resource "aws_ecs_cluster" "api" {
@@ -12,7 +12,7 @@ resource "aws_ecs_cluster" "api" {
   tags = var.default_tags
 }
 
-/*
+/**
  * Service Map
  */
 resource "aws_service_discovery_private_dns_namespace" "ecs_api" {
@@ -27,17 +27,26 @@ resource "aws_apigatewayv2_vpc_link" "ecs_api" {
   tags = var.default_tags
 }
 
-/*
- * Outputs
+/**
+ * SSM Outputs
  */
-output "ecs_api_namespace" {
+resource "aws_ssm_parameter" "dns_zone" {
+  name  = "/ecs-api/namespace"
+  type  = "String"
   value = aws_service_discovery_private_dns_namespace.ecs_api.id
+  tags  = var.default_tags
 }
 
-output "ecs_api_cluster" {
+resource "aws_ssm_parameter" "dns_zone" {
+  name  = "/ecs-api/cluster"
+  type  = "String"
   value = aws_ecs_cluster.api.arn
+  tags  = var.default_tags
 }
 
-output "ecs_api_gateway_link" {
+resource "aws_ssm_parameter" "dns_zone" {
+  name  = "/ecs-api/vpc-link"
+  type  = "String"
   value = aws_apigatewayv2_vpc_link.ecs_api.id
+  tags  = var.default_tags
 }
