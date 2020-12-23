@@ -30,21 +30,21 @@ resource "aws_apigatewayv2_vpc_link" "ecs_api" {
 /**
  * SSM Outputs
  */
-resource "aws_ssm_parameter" "dns_zone" {
+resource "aws_ssm_parameter" "ecs_api_namespace" {
   name  = "/ecs-api/namespace"
   type  = "String"
   value = aws_service_discovery_private_dns_namespace.ecs_api.id
   tags  = var.default_tags
 }
 
-resource "aws_ssm_parameter" "dns_zone" {
+resource "aws_ssm_parameter" "ecs_api_cluster" {
   name  = "/ecs-api/cluster"
   type  = "String"
   value = aws_ecs_cluster.api.arn
   tags  = var.default_tags
 }
 
-resource "aws_ssm_parameter" "dns_zone" {
+resource "aws_ssm_parameter" "ecs_api_vpc_link" {
   name  = "/ecs-api/vpc-link"
   type  = "String"
   value = aws_apigatewayv2_vpc_link.ecs_api.id
