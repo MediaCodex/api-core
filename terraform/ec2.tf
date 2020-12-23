@@ -1,4 +1,4 @@
-/*
+/**
  * EC2
  */
 data "aws_ssm_parameter" "ecs_optimised_ami" {
@@ -86,7 +86,7 @@ resource "aws_security_group" "ecs_api" {
   tags = var.default_tags
 }
 
-/*
+/**
  * Spot fleet
  */
 resource "aws_spot_fleet_request" "ecs_api" {
@@ -134,7 +134,7 @@ data "aws_iam_policy_document" "assume_spot_fleet" {
   }
 }
 
-/*
+/**
  * VPC
  */
 resource "aws_vpc" "ecs_api" {
@@ -149,6 +149,10 @@ resource "aws_vpc" "ecs_api" {
   })
 }
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 resource "aws_subnet" "ecs_api" {
   count = length(data.aws_availability_zones.available.names)
 
@@ -160,10 +164,9 @@ resource "aws_subnet" "ecs_api" {
   tags = var.default_tags
 }
 
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
+/**
+ * Routing
+ */
 resource "aws_main_route_table_association" "ecs_api" {
   vpc_id         = aws_vpc.ecs_api.id
   route_table_id = aws_route_table.ecs_api.id
@@ -185,6 +188,16 @@ resource "aws_route_table" "ecs_api" {
   tags = var.default_tags
 }
 
+resource "aws_route_table_association" "ecs_api" {
+  count = length(data.aws_availability_zones.available.names)
+
+  route_table_id = aws_route_table.ecs_api.id
+  subnet_id      = aws_subnet.ecs_api[count.index].id
+}
+
+/**
+ * Internet getways
+ */
 resource "aws_internet_gateway" "ecs_api" {
   vpc_id = aws_vpc.ecs_api.id
   tags   = var.default_tags
@@ -195,8 +208,3 @@ resource "aws_egress_only_internet_gateway" "ecs_api" {
   tags   = var.default_tags
 }
 
-resource "aws_route_table_association" "ecs_api" {
-  for_each       = toset([for subnet in aws_subnet.ecs_api: subnet.id])
-  route_table_id = aws_route_table.ecs_api.id
-  subnet_id      = each.value
-}
