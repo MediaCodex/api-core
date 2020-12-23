@@ -149,16 +149,12 @@ resource "aws_vpc" "ecs_api" {
   })
 }
 
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
 resource "aws_subnet" "ecs_api" {
-  count = length(data.aws_availability_zones.available.names)
+  count = length(var.ecs_zones)
 
   vpc_id                  = aws_vpc.ecs_api.id
   cidr_block              = "10.0.${count.index}.0/24"
-  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  availability_zone       = var.ecs_zones[count.index]
   map_public_ip_on_launch = true
 
   tags = var.default_tags
@@ -189,7 +185,7 @@ resource "aws_route_table" "ecs_api" {
 }
 
 resource "aws_route_table_association" "ecs_api" {
-  count = length(data.aws_availability_zones.available.names)
+  count = length(var.ecs_zones)
 
   route_table_id = aws_route_table.ecs_api.id
   subnet_id      = aws_subnet.ecs_api[count.index].id

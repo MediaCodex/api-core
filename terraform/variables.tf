@@ -52,6 +52,17 @@ variable "ecs_capacity" {
   }
 }
 
+variable "ecs_zones" {
+  type = list(string)
+  description = "AZs to run ECS cluster in"
+  default = [
+    "us-east-1a",
+    "us-east-1b",
+    "us-east-1c",
+    "us-east-1d"
+  ]
+}
+
 /**
  * Firebase
  */
