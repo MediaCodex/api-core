@@ -2,6 +2,9 @@
 // grouped with their use-case, e.g. SES verification
 resource "cloudflare_zone" "main" {
   zone = local.domain
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "cloudflare_zone_settings_override" "main" {
