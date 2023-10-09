@@ -52,13 +52,15 @@ const handler = async (event: SQSEvent): Promise<SQSBatchResponse> => {
   let batchItemFailures: SQSBatchItemFailure[] = []
   for (const sqsRecord of event.Records) {
     try {
-      const message: SyncUserMessage = JSON.parse(sqsRecord.body)
+      // const message: SyncUserMessage = JSON.parse(sqsRecord.body)
+      // const { userId } = message
+      const userId = sqsRecord.body
 
       // get user details from cognito
       const user = await cognito.send(
         new AdminGetUserCommand({
           UserPoolId: config.userPoolId!,
-          Username: message.userId
+          Username: userId
         })
       )
 
@@ -70,15 +72,15 @@ const handler = async (event: SQSEvent): Promise<SQSBatchResponse> => {
       )
       if (email && pictureSource === AvatarSource.Gravatar) {
         // upload to s3
-        const s3Key = await gravatarSync(email, message.userId)
+        const s3Key = await gravatarSync(email, userId)
         const imgUrl = `https://${config.cdnDomain}/${s3Key}`
 
         // set avatar url
-        console.info(`saving picture url (${message.userId}): ${imgUrl}`)
+        console.info(`saving picture url (${userId}): ${imgUrl}`)
         await cognito.send(
           new AdminUpdateUserAttributesCommand({
             UserPoolId: config.userPoolId,
-            Username: message.userId,
+            Username: userId,
             UserAttributes: [
               {
                 Name: 'picture',
@@ -99,9 +101,9 @@ const handler = async (event: SQSEvent): Promise<SQSBatchResponse> => {
       }
 
       // store user in ddb
-      console.info(`syncing user to ddb (${message.userId})`)
+      console.info(`syncing user to ddb (${userId})`)
       await userRepository.store({
-        id: message.userId,
+        id: userId,
         username: user.Username,
         // assumed to exist because it's enforced by the user pool settings
         name: getUserAttribute(user.UserAttributes!, 'name')!,

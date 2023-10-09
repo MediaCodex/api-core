@@ -59,7 +59,7 @@ resource "aws_apigatewayv2_authorizer" "auth_cognito" {
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_apigatewayv2_route" "auth_user_sync" {
   api_id             = aws_apigatewayv2_api.auth.id
-  route_key          = "/sync"
+  route_key          = "GET /sync"
   target             = "integrations/${aws_apigatewayv2_integration.auth_user_sync.id}"
   authorizer_id      = aws_apigatewayv2_authorizer.auth_cognito.id
   authorization_type = "JWT"
@@ -74,7 +74,7 @@ resource "aws_apigatewayv2_integration" "auth_user_sync" {
 
   request_parameters = {
     "QueueUrl"    = aws_sqs_queue.user_sync.url
-    "MessageBody" = "{\"userId\": \"$context.authorizer.principalId\"}"
+    "MessageBody" = "$context.authorizer.claims.sub"
   }
 }
 
@@ -96,7 +96,7 @@ data "aws_iam_policy_document" "auth_user_sync_assume" {
 
 resource "aws_iam_role_policy" "auth_user_sync" {
   name   = "DynamoDB"
-  role   = aws_iam_role.auth_user_sync.arn
+  role   = aws_iam_role.auth_user_sync.id
   policy = data.aws_iam_policy_document.auth_user_sync.json
 }
 

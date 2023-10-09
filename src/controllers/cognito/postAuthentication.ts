@@ -12,12 +12,12 @@ const handler: PostAuthenticationTriggerHandler = async (event) => {
   }
 
   // asynchronously process user
-  const message: SyncUserMessage = { userId }
+  const message: SyncUserMessage = userId
   const sqs = new SQSClient({ region: config.awsRegion })
   await sqs.send(
     new SendMessageCommand({
       QueueUrl: config.userSyncQueueUrl,
-      MessageBody: JSON.stringify(message)
+      MessageBody: message // JSON.stringify(message)
     })
   )
 

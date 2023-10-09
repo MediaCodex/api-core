@@ -27,7 +27,7 @@ module "sqs_lambda_sqs_sync_user" {
 
   queue_arn          = var.user_sync_queue_arn
   function_name      = module.lambda_sqs_sync_user.function_name
-  function_role_name = module.lambda_sqs_sync_user.role_arn
+  function_role_name = module.lambda_sqs_sync_user.role_id
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
