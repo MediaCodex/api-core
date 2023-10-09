@@ -1,16 +1,16 @@
-/**
- * Domain
- */
+locals {
+  # TODO: fix this after the deleted aws accounts have been removed
+  api_domain = local.environment == "dev" ? "devapi.${local.domain}" : "api.${local.domain}"
+}
+
 resource "aws_apigatewayv2_domain_name" "default" {
-  domain_name = "api.${local.domain}"
+  domain_name = local.api_domain
 
   domain_name_configuration {
     certificate_arn = aws_acm_certificate.api.arn
     endpoint_type   = "REGIONAL"
     security_policy = "TLS_1_2"
   }
-
-  tags = var.default_tags
 }
 
 resource "cloudflare_record" "api" {
@@ -21,28 +21,27 @@ resource "cloudflare_record" "api" {
   proxied = true
 }
 
-/**
- * Origin Cert
- */
+# ----------------------------------------------------------------------------------------------------------------------
+# Origin Cert
+# ----------------------------------------------------------------------------------------------------------------------
 resource "tls_private_key" "api" {
   algorithm = "RSA"
 }
 
 resource "tls_cert_request" "api" {
-  key_algorithm   = tls_private_key.api.algorithm
   private_key_pem = tls_private_key.api.private_key_pem
 
-  dns_names = ["api.${local.domain}"]
+  dns_names = [local.api_domain]
 
   subject {
-    common_name  = "api.${local.domain}"
+    common_name  = local.api_domain
     organization = "MediaCodex"
   }
 }
 
 resource "cloudflare_origin_ca_certificate" "api" {
   csr                = tls_cert_request.api.cert_request_pem
-  hostnames          = ["api.${local.domain}"]
+  hostnames          = [local.api_domain]
   request_type       = "origin-rsa"
   requested_validity = 5475 // (15yrs) Cloudflare default
 }
@@ -53,12 +52,11 @@ resource "aws_acm_certificate" "api" {
   certificate_chain = file("../cloudflare_origin_root_ca.pem")
 }
 
-/**
- * SSM Outputs
- */
+# ----------------------------------------------------------------------------------------------------------------------
+# SSM Outputs
+# ----------------------------------------------------------------------------------------------------------------------
 resource "aws_ssm_parameter" "gateway_public_domain" {
   name  = "/gateway-public/domain"
   type  = "String"
   value = aws_apigatewayv2_domain_name.default.id
-  tags  = var.default_tags
 }

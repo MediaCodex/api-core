@@ -1,0 +1,6 @@
+version: 0.2
+
+env:
+  secrets-manager:
+    TF_VAR_cloudflare_account_id: "CloudflareSecrets:accountId"
+    CLOUDFLARE_API_KEY: "CloudflareSecrets:apiKey"
