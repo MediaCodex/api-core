@@ -15,7 +15,7 @@ resource "aws_apigatewayv2_domain_name" "main" {
 
 resource "cloudflare_record" "api" {
   zone_id = cloudflare_zone.main.id
-  name    = "api"
+  name    = aws_apigatewayv2_domain_name.main.domain_name
   type    = "CNAME"
   value   = aws_apigatewayv2_domain_name.main.domain_name_configuration.0.target_domain_name
   proxied = true

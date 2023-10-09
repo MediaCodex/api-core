@@ -36,7 +36,7 @@ resource "aws_apigatewayv2_api_mapping" "api" {
   domain_name     = aws_apigatewayv2_domain_name.main.id
   api_id          = aws_apigatewayv2_api.auth.id
   stage           = aws_apigatewayv2_stage.auth_v1.id
-  api_mapping_key = "auth"
+  api_mapping_key = "${aws_apigatewayv2_stage.auth_v1.name}/auth"
 }
 
 resource "aws_apigatewayv2_authorizer" "auth_cognito" {
