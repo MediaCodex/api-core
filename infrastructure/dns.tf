@@ -13,12 +13,3 @@ resource "cloudflare_zone_settings_override" "main" {
     automatic_https_rewrites = "on"
   }
 }
-
-# ----------------------------------------------------------------------------------------------------------------------
-# SSM outputs
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_ssm_parameter" "dns_zone" {
-  name  = "/cloudflare-zones/main"
-  type  = "String"
-  value = cloudflare_zone.main.id
-}

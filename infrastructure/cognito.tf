@@ -1,5 +1,5 @@
 locals {
-  cognito_domain   = "auth.${cloudflare_zone.main.zone}"
+  cognito_domain = "auth.${cloudflare_zone.main.zone}"
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -36,14 +36,17 @@ resource "aws_cognito_user_pool" "main" {
   }
 
   lambda_config {
-    post_authentication  = module.functions.cognito_function_arns.post_authentication
+    post_authentication = module.functions.cognito_function_arns.post_authentication
     # TODO: setup MJML email templates
     # custom_message       = module.functions.cognito_function_arns.custom_message
   }
 }
 
-resource "aws_cognito_user_pool_client" "dashboard" {
-  name            = "dashboard"
+# ----------------------------------------------------------------------------------------------------------------------
+# Web Client (created here that it can be referenced by gateways without ending up in a dependency loop)
+# ----------------------------------------------------------------------------------------------------------------------
+resource "aws_cognito_user_pool_client" "website" {
+  name            = "website"
   user_pool_id    = aws_cognito_user_pool.main.id
   generate_secret = false
 
@@ -55,27 +58,7 @@ resource "aws_cognito_user_pool_client" "dashboard" {
   allowed_oauth_scopes                 = ["openid", "profile"]
 
   callback_urls = concat(var.auth_callback_urls, [
-    "https://${cloudflare_zone.main.zone}"
+    "https://${cloudflare_zone.main.zone}",
   ])
 }
 
-# ----------------------------------------------------------------------------------------------------------------------
-# SSM Params
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_ssm_parameter" "cognito_pool_id" {
-  name  = "/gateway-public/cognito/pool-id"
-  type  = "String"
-  value = aws_cognito_user_pool.main.id
-}
-
-resource "aws_ssm_parameter" "cognito_password_polic" {
-  name  = "/gateway-public/cognito/password-policy"
-  type  = "String"
-  value = jsonencode(aws_cognito_user_pool.main.password_policy[0])
-}
-
-resource "aws_ssm_parameter" "cognito_client_dashboard" {
-  name  = "/gateway-public/cognito/client-dashboard"
-  type  = "String"
-  value = aws_cognito_user_pool_client.dashboard.id
-}

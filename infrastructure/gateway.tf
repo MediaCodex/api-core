@@ -3,7 +3,7 @@ locals {
   api_domain = local.environment == "dev" ? "devapi.${local.domain}" : "api.${local.domain}"
 }
 
-resource "aws_apigatewayv2_domain_name" "default" {
+resource "aws_apigatewayv2_domain_name" "main" {
   domain_name = local.api_domain
 
   domain_name_configuration {
@@ -17,7 +17,7 @@ resource "cloudflare_record" "api" {
   zone_id = cloudflare_zone.main.id
   name    = "api"
   type    = "CNAME"
-  value   = aws_apigatewayv2_domain_name.default.domain_name_configuration.0.target_domain_name
+  value   = aws_apigatewayv2_domain_name.main.domain_name_configuration.0.target_domain_name
   proxied = true
 }
 
@@ -50,13 +50,4 @@ resource "aws_acm_certificate" "api" {
   private_key       = tls_private_key.api.private_key_pem
   certificate_body  = cloudflare_origin_ca_certificate.api.certificate
   certificate_chain = file("../cloudflare_origin_root_ca.pem")
-}
-
-# ----------------------------------------------------------------------------------------------------------------------
-# SSM Outputs
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_ssm_parameter" "gateway_public_domain" {
-  name  = "/gateway-public/domain"
-  type  = "String"
-  value = aws_apigatewayv2_domain_name.default.id
 }
