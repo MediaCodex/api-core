@@ -1,0 +1,43 @@
+{
+  "name": "@mediacodex/api-core",
+  "version": "1.0.0",
+  "description": "Core Microservice",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/mediacodex/api/core.git"
+  },
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://gitlab.com/mediacodex/api/core/-/issues"
+  },
+  "homepage": "https://gitlab.com/mediacodex/api/core",
+  "engines": {
+    "node": ">= 18.18.0",
+    "npm": ">= 9.8.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.123",
+    "@types/mime": "^3.0.2",
+    "@types/node": "^20.8.2",
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.3",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.2.2",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.427.0",
+    "@aws-sdk/client-dynamodb": "^3.425.0",
+    "@aws-sdk/client-s3": "^3.427.0",
+    "@aws-sdk/client-sqs": "^3.427.0",
+    "@aws-sdk/lib-dynamodb": "^3.425.0",
+    "@aws-sdk/lib-storage": "^3.427.0",
+    "@middy/core": "^4.6.4",
+    "@middy/http-error-handler": "^4.6.4",
+    "@middy/http-json-body-parser": "^4.6.4",
+    "@middy/http-response-serializer": "^4.6.4",
+    "@middy/input-output-logger": "^4.6.4",
+    "mime": "^3.0.0"
+  }
+}
