@@ -5,8 +5,9 @@ const { IgnorePlugin } = require('webpack')
  * Lambda Functions
  */
 const entryPoints = {
-  'cognito-pre-token-gen': './src/controllers/cognito/preTokenGen.ts',
+  // 'cognito-pre-token-gen': './src/controllers/cognito/preTokenGen.ts',
   'cognito-post-authentication': './src/controllers/cognito/postAuthentication.ts',
+  'sqs-sync-user': './src/controllers/sqs/syncUser.ts',
 }
 
 /**
@@ -45,6 +46,7 @@ module.exports = {
 
   plugins: [
     // https://github.com/aws/aws-sdk-js-v3/issues/5301
-    new IgnorePlugin({ resourceRegExp: /^aws-crt$/ })
+    new IgnorePlugin({ resourceRegExp: /^aws-crt$/ }),
+    new IgnorePlugin({ resourceRegExp: /load-crt$/ })
   ]
 }

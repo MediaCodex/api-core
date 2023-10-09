@@ -40,7 +40,7 @@ build: build-functions ## Build everything
 
 build-functions: ## Build lambda functions
 	@echo "Building lambda functions"
-	rm -r ./dist/*
+	rm -rf ./dist/*
 	$(WEBPACK)
 	cd dist && for i in *.js; do cp "$$i" index.js && zip "$${i%.js*}.zip" index.js && rm index.js; done
 
