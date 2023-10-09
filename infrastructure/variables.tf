@@ -2,11 +2,20 @@ locals {
   environment = contains(var.environments, terraform.workspace) ? terraform.workspace : "dev"
   domain      = lookup(var.domains, local.environment)
   aws_account = lookup(var.aws_accounts, local.environment)
+  prefix      = "core-"
 }
 
 variable "environments" {
   type    = set(string)
   default = ["dev", "prod"]
+}
+
+variable "domains" {
+  type = map(any)
+  default = {
+    dev  = "mediacodex.dev"
+    prod = "mediacodex.net"
+  }
 }
 
 variable "email_spf_includes" {
@@ -17,11 +26,19 @@ variable "email_spf_includes" {
 # ----------------------------------------------------------------------------------------------------------------------
 # API
 # ----------------------------------------------------------------------------------------------------------------------
-variable "domains" {
-  type = map(any)
+variable "cors_origins" {
+  type = map(list(string))
   default = {
-    dev  = "mediacodex.dev"
-    prod = "mediacodex.net"
+    dev  = ["*"]
+    prod = ["https://littleurl.io"]
+  }
+}
+
+variable "cors_expose" {
+  type = map(list(string))
+  default = {
+    dev  = ["*"]
+    prod = []
   }
 }
 
@@ -30,7 +47,6 @@ variable "auth_callback_urls" {
   description = "Additional callback domains for cognito client"
   default     = []
 }
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # AWS
