@@ -13,9 +13,11 @@ import { getExtension } from 'mime'
 import config from '../../config'
 import { getUserAttribute } from '../../helpers'
 import { initRepositories } from '../../repositories'
-import { AvatarSource, SyncUserMessage } from '../../types'
 
-const gravatarSync = async (email: string, userId: string): Promise<string> => {
+const gravatarSync = async (
+  email: string,
+  userId: string
+): Promise<string | undefined> => {
   // hash email to get gravatar email
   const cleanEmail = email.toLocaleLowerCase().trim()
   const hash = createHash('md5').update(cleanEmail).digest('hex')
@@ -24,6 +26,10 @@ const gravatarSync = async (email: string, userId: string): Promise<string> => {
   // get the file from gravatar
   console.info(`downloading gravatar: ${gravatarUrl}`)
   const gravatarRes = await fetch(gravatarUrl)
+  if (gravatarRes.status !== 200) {
+    console.info(`Gravatar error response (${gravatarRes.status})`)
+    return undefined
+  }
   const extension = getExtension(gravatarRes.headers.get('content-type')!)
   const s3Key = `avatar/${userId}.${extension}`
 
@@ -34,7 +40,8 @@ const gravatarSync = async (email: string, userId: string): Promise<string> => {
     params: {
       Bucket: config.cdnBucket,
       Key: s3Key,
-      Body: gravatarRes.body ?? undefined
+      Body: gravatarRes.body ?? undefined,
+      ContentType: gravatarRes.headers.get('content-type')!
     }
   })
   await upload.done()
@@ -66,37 +73,36 @@ const handler = async (event: SQSEvent): Promise<SQSBatchResponse> => {
 
       // update avatar via gravatar
       const email = getUserAttribute(user.UserAttributes, 'email')
-      const pictureSource = getUserAttribute(
-        user.UserAttributes,
-        'pictureSource'
-      )
-      if (email && pictureSource === AvatarSource.Gravatar) {
+      const enableGravatar = getUserAttribute(user.UserAttributes, 'custom:enable_gravatar') // prettier-ignore
+      if (email && enableGravatar) {
         // upload to s3
         const s3Key = await gravatarSync(email, userId)
         const imgUrl = `https://${config.cdnDomain}/${s3Key}`
 
         // set avatar url
-        console.info(`saving picture url (${userId}): ${imgUrl}`)
-        await cognito.send(
-          new AdminUpdateUserAttributesCommand({
-            UserPoolId: config.userPoolId,
-            Username: userId,
-            UserAttributes: [
-              {
-                Name: 'picture',
-                Value: imgUrl
-              }
-            ]
-          })
-        )
+        if (imgUrl) {
+          console.info(`saving picture url (${userId}): ${imgUrl}`)
+          await cognito.send(
+            new AdminUpdateUserAttributesCommand({
+              UserPoolId: config.userPoolId,
+              Username: userId,
+              UserAttributes: [
+                {
+                  Name: 'picture',
+                  Value: imgUrl
+                }
+              ]
+            })
+          )
 
-        // overwrite the user attribute so that the new url can be used later
-        const pictureIndex = user.UserAttributes!.findIndex(
-          (attr) => attr.Name === 'picture'
-        )
-        user.UserAttributes![pictureIndex ?? user.UserAttributes!.length++] = {
-          Name: 'picture',
-          Value: imgUrl
+          // overwrite the user attribute so that the new url can be used later
+          const pictureIndex =
+            user.UserAttributes!.findIndex((attr) => attr.Name === 'picture') ??
+            user.UserAttributes!.length++
+          user.UserAttributes![pictureIndex] = {
+            Name: 'picture',
+            Value: imgUrl
+          }
         }
       }
 

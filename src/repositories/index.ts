@@ -5,7 +5,11 @@ import UserRepository from './user'
 
 export const initRepositories = () => {
   const ddbClient = new DynamoDBClient({ region: config.awsRegion })
-  const ddbDocumentClient = DynamoDBDocumentClient.from(ddbClient)
+  const ddbDocumentClient = DynamoDBDocumentClient.from(ddbClient, {
+    marshallOptions: {
+      removeUndefinedValues: true
+    }
+  })
 
   return {
     userRepository: UserRepository(ddbDocumentClient)

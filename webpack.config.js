@@ -46,7 +46,6 @@ module.exports = {
 
   plugins: [
     // https://github.com/aws/aws-sdk-js-v3/issues/5301
-    new IgnorePlugin({ resourceRegExp: /^aws-crt$/ }),
-    new IgnorePlugin({ resourceRegExp: /load-crt$/ })
+    new IgnorePlugin({ resourceRegExp: /^aws-crt$/ })
   ]
 }
