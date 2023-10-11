@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.123",
+    "@types/luxon": "^3.3.2",
     "@types/mime": "^3.0.2",
     "@types/node": "^20.8.2",
     "eslint": "^8.50.0",
@@ -31,6 +32,7 @@
     "@aws-sdk/client-dynamodb": "^3.425.0",
     "@aws-sdk/client-s3": "^3.427.0",
     "@aws-sdk/client-sqs": "^3.427.0",
+    "@aws-sdk/client-ssm": "^3.427.0",
     "@aws-sdk/lib-dynamodb": "^3.425.0",
     "@aws-sdk/lib-storage": "^3.427.0",
     "@aws-sdk/signature-v4-multi-region": "^3.425.0",
@@ -39,6 +41,7 @@
     "@middy/http-json-body-parser": "^4.6.4",
     "@middy/http-response-serializer": "^4.6.4",
     "@middy/input-output-logger": "^4.6.4",
+    "luxon": "^3.4.3",
     "mime": "^3.0.0"
   }
 }

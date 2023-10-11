@@ -18,6 +18,12 @@ resource "aws_cognito_user_pool" "main" {
     "email"
   ]
 
+  schema {
+    name                = "enable_gravatar"
+    attribute_data_type = "Boolean"
+    mutable             = true
+  }
+
   software_token_mfa_configuration {
     enabled = true
   }

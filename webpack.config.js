@@ -8,6 +8,7 @@ const entryPoints = {
   // 'cognito-pre-token-gen': './src/controllers/cognito/preTokenGen.ts',
   'cognito-post-authentication': './src/controllers/cognito/postAuthentication.ts',
   'sqs-sync-user': './src/controllers/sqs/syncUser.ts',
+  'eventbridge-sync-cdn': './src/controllers/eventbridge/syncCdn.ts',
 }
 
 /**

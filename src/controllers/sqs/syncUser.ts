@@ -31,14 +31,14 @@ const gravatarSync = async (
     return undefined
   }
   const extension = getExtension(gravatarRes.headers.get('content-type')!)
-  const s3Key = `avatar/${userId}.${extension}`
+  const s3Key = `${userId}.${extension}`
 
   // upload file to s3
   console.info(`uploading gravatar: ${s3Key}`)
   const upload = new Upload({
     client: new S3Client({ region: config.awsRegion }),
     params: {
-      Bucket: config.cdnBucket,
+      Bucket: config.avatarsBucket,
       Key: s3Key,
       Body: gravatarRes.body ?? undefined,
       ContentType: gravatarRes.headers.get('content-type')!

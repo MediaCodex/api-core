@@ -33,11 +33,16 @@ variable "user_sync_queue_url" {
   type = string
 }
 
-variable "cdn_bucket_name" {
+variable "avatars_bucket" {
   type = string
 }
 
-variable "cdn_domain" {
+variable "cdn_buckets_map" {
+  type        = map(string)
+  description = "cdn_dir => bucket_arn"
+}
+
+variable "cdn_event_bus" {
   type = string
 }
 

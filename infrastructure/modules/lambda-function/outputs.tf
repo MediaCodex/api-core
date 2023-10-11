@@ -22,3 +22,8 @@ output "function_name" {
   value       = aws_lambda_function.default.function_name
   description = "Name of Lambda function"
 }
+
+output "dlq_arn" {
+  value       = var.enable_dlq ? aws_sqs_queue.dlq[0].arn : null
+  description = "ARN of the SQS queue for failed invocations"
+}

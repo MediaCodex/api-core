@@ -10,7 +10,7 @@ variable "function_role_name" {
 
 variable "queue_arn" {
   type        = string
-  description = "ARN of the aource SQS queue"
+  description = "ARN of the source SQS queue"
 }
 
 variable "batch_size" {

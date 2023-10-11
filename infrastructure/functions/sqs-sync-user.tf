@@ -17,8 +17,6 @@ module "lambda_sqs_sync_user" {
   environment_variables = merge(local.envvar_default, {
     "COGNITO_USER_POOL_ID" = var.cognito_pool_id
     "USER_SYNC_QUEUE_URL"  = var.user_sync_queue_url
-    "CDN_S3_BUCKET"        = var.cdn_bucket_name
-    "CDN_DOMAIN"           = var.cdn_domain
   })
 }
 
@@ -68,6 +66,6 @@ data "aws_iam_policy_document" "lambda_sqs_sync_user_misc" {
       "s3:PutObject"
     ]
 
-    resources = ["arn:aws:s3:::${var.cdn_bucket_name}/avatar/*"]
+    resources = ["arn:aws:s3:::${var.avatars_bucket}/*"]
   }
 }
