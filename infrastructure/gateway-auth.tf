@@ -30,6 +30,12 @@ resource "aws_apigatewayv2_stage" "auth_v1" {
     // auto-deploy changes this
     ignore_changes = [deployment_id]
   }
+
+  route_settings {
+    route_key              = aws_apigatewayv2_route.auth_user_sync.route_key
+    throttling_rate_limit  = 1
+    throttling_burst_limit = 5
+  }
 }
 
 resource "aws_apigatewayv2_api_mapping" "api" {
@@ -40,9 +46,9 @@ resource "aws_apigatewayv2_api_mapping" "api" {
 }
 
 resource "aws_apigatewayv2_authorizer" "auth_cognito" {
-  api_id           = aws_apigatewayv2_api.auth.id
-  authorizer_type  = "JWT"
-  name             = "cognito"
+  api_id          = aws_apigatewayv2_api.auth.id
+  authorizer_type = "JWT"
+  name            = "cognito"
 
   identity_sources = [
     "$request.header.Authorization"
