@@ -17,6 +17,7 @@ module "lambda_sqs_sync_user" {
   environment_variables = merge(local.envvar_default, {
     "COGNITO_USER_POOL_ID" = var.cognito_pool_id
     "USER_SYNC_QUEUE_URL"  = var.user_sync_queue_url
+    "AVATARS_BUCKET"       = var.avatars_bucket
   })
 }
 

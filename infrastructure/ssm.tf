@@ -7,18 +7,11 @@ resource "aws_ssm_parameter" "dns_zone" {
 # ----------------------------------------------------------------------------------------------------------------------
 # CDN
 # ----------------------------------------------------------------------------------------------------------------------
-resource "aws_ssm_parameter" "cdn_event_bus" {
-  name  = "/core/cdn-event-bus-arn"
-  type  = "String"
-  value = aws_cloudwatch_event_bus.cdn.arn
-}
-
 resource "aws_ssm_parameter" "cdn_avatars_bucket" {
   name  = "${local.cdn_buckets_ssm_prefix}avatars"
   type  = "String"
   value = aws_s3_bucket.avatars.id
 }
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Gateway

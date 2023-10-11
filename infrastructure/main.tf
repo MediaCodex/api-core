@@ -12,7 +12,6 @@ module "functions" {
   user_sync_queue_url          = aws_sqs_queue.user_sync.url
   avatars_bucket               = aws_s3_bucket.avatars.id
   cdn_buckets_map              = local.cdn_buckets
-  cdn_event_bus                = aws_cloudwatch_event_bus.cdn.arn
 
   environment = {
     "CDN_R2_BUCKET" = "mediacodex-${local.environment}-cdn-assets" # cloudflare_r2_bucket.cdn_assets.name

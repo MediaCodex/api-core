@@ -58,7 +58,7 @@ data "aws_iam_policy_document" "lambda_eventbridge_sync_cdn_misc" {
 resource "aws_cloudwatch_event_rule" "cdn_sync" {
   name           = "sync-assets-to-cloudflare"
   description    = "Sync S3 objects to Cloudflare"
-  event_bus_name = var.cdn_event_bus
+  event_bus_name = "default"
 
   event_pattern = jsonencode({
     "source"      = ["aws.s3"],
@@ -74,7 +74,7 @@ resource "aws_cloudwatch_event_rule" "cdn_sync" {
 }
 
 resource "aws_cloudwatch_event_target" "cdn_sync" {
-  event_bus_name = var.cdn_event_bus
+  event_bus_name = "default"
   rule           = aws_cloudwatch_event_rule.cdn_sync.name
   target_id      = "SendToLambda"
   arn            = module.lambda_eventbridge_sync_cdn.function_arn

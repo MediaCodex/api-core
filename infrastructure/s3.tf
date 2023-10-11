@@ -2,6 +2,14 @@ resource "aws_s3_bucket" "avatars" {
   bucket_prefix = "cdn-assets-avatars-"
 }
 
+resource "aws_s3_bucket_notification" "avatars" {
+  bucket      = aws_s3_bucket.avatars.id
+  eventbridge = true
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Access
+# ----------------------------------------------------------------------------------------------------------------------
 resource "aws_s3_bucket_ownership_controls" "avatars" {
   bucket = aws_s3_bucket.avatars.id
   rule {
@@ -9,6 +17,18 @@ resource "aws_s3_bucket_ownership_controls" "avatars" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "avatars" {
+  bucket = aws_s3_bucket.avatars.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Lifecycle
+# ----------------------------------------------------------------------------------------------------------------------
 resource "aws_s3_bucket_versioning" "avatars" {
   bucket = aws_s3_bucket.avatars.id
   versioning_configuration {
@@ -42,13 +62,4 @@ resource "aws_s3_bucket_lifecycle_configuration" "avatars" {
       noncurrent_days = 360
     }
   }
-}
-
-resource "aws_s3_bucket_public_access_block" "avatars" {
-  bucket = aws_s3_bucket.avatars.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
 }
