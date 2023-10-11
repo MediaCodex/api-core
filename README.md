@@ -36,15 +36,17 @@ it is also used for generating the IAM policy to allow `s3:GetObject` only to sp
 
 **NOTE:** currently the R2 bucket domain mapping needs to be [configured manually][r2DomainDocs] as it's [not supported by Terraform][r2TerraformIssue]
 
-**NOTE:** You will need to configure a SSM parameter called `/core/cloudflare-secrets` containing the [R2 authentication keys][r2AuthDocs].
+**NOTE:** You will need to configure a SecretsManager Secret called `/core/cloudflare-cdn` containing the [R2 authentication keys][r2AuthDocs].
 The param should be a `SecureString` with a content of stringified JSON using the structure below.
 
 ```json
 {
   "accountId": "string",
+  "r2AccessToken": "string",
   "r2AccessKeyId": "string",
   "r2SecretAccessKey": "string",
-  "imagesAccessToken": "string"
+  "imagesAccessToken": "string",
+  "imagesAccountHash": "string",
 }
 ```
 

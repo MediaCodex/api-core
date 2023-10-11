@@ -16,8 +16,9 @@ const config: Config = {
   avatarsBucket: process.env.AVATARS_BUCKET,
 
   // cdn
-  cdnR2Bucket: process.env.CDN_R2_BUCKET,
   cdnDomain: process.env.CDN_DOMAIN,
+  cdnR2Bucket: process.env.CDN_R2_BUCKET,
+  cdnSecretName: '/core/cloudflare-cdn',
   cdnBucketMap: JSON.parse(process.env.CDN_BUCKET_MAPPING ?? '{}'),
 
   // misc

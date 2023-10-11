@@ -11,8 +11,9 @@ export type Config = {
   awsRegion: string
 
   // cdn
-  cdnR2Bucket?: string
   cdnDomain?: string
+  cdnR2Bucket?: string
+  cdnSecretName: string
   cdnBucketMap: {
     [dir: string]: string
   }

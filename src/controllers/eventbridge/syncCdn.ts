@@ -20,7 +20,7 @@ import { Readable } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import { tmpdir } from 'os'
 import config from '../../config'
-import { getSSMParam } from '../../helpers'
+import { getSSMParam, getSecretsManagerSecret } from '../../helpers'
 import { CloudflareR2Secret } from '../../types'
 
 const imageMimeTypes: string[] = []
@@ -39,10 +39,9 @@ const handler: S3NotificationEventBridgeHandler = async (
   const s3Client = new S3Client({ region: config.awsRegion })
 
   // get the cloudflare access keys
-  // TODO: move to SecretsManager
-  const cloudflareSecretSSM = await getSSMParam('/core/cloudflare-secrets')
-  if (!cloudflareSecretSSM) throw new Error('missing cloudflare secrets')
-  const cloudflareSecret: CloudflareR2Secret = JSON.parse(cloudflareSecretSSM)
+  const cloudflareSecretRaw = await getSecretsManagerSecret(config.cdnSecretName)
+  if (!cloudflareSecretRaw) throw new Error('missing cloudflare secrets')
+  const cloudflareSecret: CloudflareR2Secret = JSON.parse(cloudflareSecretRaw)
 
   // only listen to object creation events
   if (event['detail-type'] !== 'Object Created') {

@@ -37,3 +37,18 @@ resource "aws_cloudwatch_event_bus" "cdn" {
 #   value   = aws_cloudfront_distribution.cdn_assets.domain_name
 #   proxied = true
 # }
+
+resource "cloudflare_page_rule" "cdn" {
+  zone_id = cloudflare_zone.main.id
+  target  = "${local.cdn_domain}/*"
+
+  actions {
+    cache_level = "cache_everything"
+
+    minify {
+      html = "on"
+      css  = "on"
+      js   = "on"
+    }
+  }
+}
