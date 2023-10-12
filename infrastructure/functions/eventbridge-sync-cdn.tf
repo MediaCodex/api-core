@@ -50,6 +50,18 @@ data "aws_iam_policy_document" "lambda_eventbridge_sync_cdn_misc" {
       for dir, bucket in var.cdn_buckets_map : "arn:aws:s3:::${bucket}/*"
     ]
   }
+
+  statement {
+    sid = "SecretsManager"
+
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+
+    resources = [
+      "arn:aws:secretsmanager:${var.aws_region}:${var.aws_account}:secret:/core/cloudflare-cdn*"
+    ]
+  }
 }
 
 # ----------------------------------------------------------------------------------------------------------------------

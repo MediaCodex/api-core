@@ -4,6 +4,7 @@ import {
   S3Client
 } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import middy from '@middy/core'
 import inputOutputLogger from '@middy/input-output-logger'
 import {
@@ -11,7 +12,6 @@ import {
   S3NotificationEventBridgeHandler
 } from 'aws-lambda'
 import { randomUUID } from 'crypto'
-import { openAsBlob } from 'fs'
 import { DateTime } from 'luxon'
 import { createReadStream, createWriteStream } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
@@ -20,10 +20,16 @@ import { Readable } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import { tmpdir } from 'os'
 import config from '../../config'
-import { getSSMParam, getSecretsManagerSecret } from '../../helpers'
+import { getSecretsManagerSecret } from '../../helpers'
 import { CloudflareR2Secret } from '../../types'
 
-const imageMimeTypes: string[] = []
+const imageMimeTypes: string[] = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/svg+xml'
+]
 
 const getPrefix = (bucketName: string): string => {
   for (const [dir, bucket] of Object.entries(config.cdnBucketMap)) {
@@ -36,12 +42,23 @@ const getPrefix = (bucketName: string): string => {
 const handler: S3NotificationEventBridgeHandler = async (
   event: S3NotificationEvent
 ): Promise<void> => {
-  const s3Client = new S3Client({ region: config.awsRegion })
-
   // get the cloudflare access keys
-  const cloudflareSecretRaw = await getSecretsManagerSecret(config.cdnSecretName)
+  const cloudflareSecretRaw = await getSecretsManagerSecret(
+    config.cdnSecretName
+  )
   if (!cloudflareSecretRaw) throw new Error('missing cloudflare secrets')
   const cloudflareSecret: CloudflareR2Secret = JSON.parse(cloudflareSecretRaw)
+
+  // setup client sdks
+  const s3Client = new S3Client({ region: config.awsRegion })
+  const r2Client = new S3Client({
+    region: 'auto',
+    endpoint: `https://${cloudflareSecret.accountId}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: cloudflareSecret.r2AccessKeyId,
+      secretAccessKey: cloudflareSecret.r2SecretAccessKey
+    }
+  })
 
   // only listen to object creation events
   if (event['detail-type'] !== 'Object Created') {
@@ -74,40 +91,52 @@ const handler: S3NotificationEventBridgeHandler = async (
 
   // upload the object to Cloudflare R2
   console.info('uploading file to R2')
+  const targetKey = `${getPrefix(sourceBucketName)}/${sourceObjectKey}`
   const r2Upload = new Upload({
-    client: new S3Client({
-      region: 'auto',
-      endpoint: `https://${cloudflareSecret.accountId}.r2.cloudflarestorage.com`,
-      credentials: {
-        accessKeyId: cloudflareSecret.r2AccessKeyId,
-        secretAccessKey: cloudflareSecret.r2SecretAccessKey
-      }
-    }),
+    client: r2Client,
     params: {
       Bucket: config.cdnR2Bucket,
-      Key: `${getPrefix(sourceBucketName)}/${sourceObjectKey}`,
+      Key: targetKey,
       Body: createReadStream(tmpFile),
-      ChecksumSHA256: s3Object.ChecksumSHA256
+      ChecksumSHA256: s3Object.ChecksumSHA256,
+      ContentType: s3Object.ContentType
     }
   })
   await r2Upload.done()
 
   // upload the object to Cloudflare Images
-  if (s3Object.ContentType && imageMimeTypes.includes(s3Object.ContentType)) {
+  if (imageMimeTypes.includes(s3Object.ContentType ?? '')) {
+    // get temp url ro access r2, both because formData is crap and to reduce AWS bandwidth costs
+    console.info('getting signed url')
+    const signedCommand = new GetObjectCommand({
+      Bucket: config.cdnR2Bucket,
+      Key: targetKey
+    })
+    const signedUrl = await getSignedUrl(r2Client, signedCommand, {
+      expiresIn: 30
+    })
+
+    // tell Images to add new file
     console.info('uploading file to Cloudflare Images')
     const formData = new FormData()
-    formData.append('file', await openAsBlob(tmpFile))
-    await fetch(
+    formData.append('url', signedUrl)
+    formData.append('id', targetKey)
+    const res = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${cloudflareSecret.accountId}/images/v1`,
       {
         method: 'POST',
         body: formData,
         headers: {
-          Authorization: `Bearer ${cloudflareSecret.imagesAccessToken}`,
-          'Content-Type': 'multipart/form-data'
+          Authorization: `Bearer ${cloudflareSecret.imagesAccessToken}`
         }
       }
     )
+    if (!res.ok && res.status !== 409) {
+      if (res.body) console.error(`image upload res`, await res.text())
+      throw new Error(
+        `Failed to upload image to Cloudflare Image (${res.status})`
+      )
+    }
   }
 
   // tag the object version as synced

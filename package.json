@@ -36,6 +36,7 @@
     "@aws-sdk/client-ssm": "^3.427.0",
     "@aws-sdk/lib-dynamodb": "^3.425.0",
     "@aws-sdk/lib-storage": "^3.427.0",
+    "@aws-sdk/s3-request-presigner": "^3.427.0",
     "@aws-sdk/signature-v4-multi-region": "^3.425.0",
     "@middy/core": "^4.6.4",
     "@middy/http-error-handler": "^4.6.4",
