@@ -23,9 +23,7 @@ on external providers and not publicly listing an MD5 hash of the users email ad
 ### CDN
 
 While each microservice retains ultimate control of their own asset file, there is an automated system in place that will
-download the assets from each of the individual buckets and upload them to a centralised location on Cloudflare. This is
-done both so that there is only a single public subdomain for accessing the files, to reduce bandwidth costs, and enables
-the use of [Cloudflare Images](https://www.cloudflare.com/en-gb/developer-platform/cloudflare-images/) for automatic optimization.
+download the assets from each of the individual buckets and upload them to a centralised location on Cloudflare.
 
 The way that new buckets are configured is by creating a new SSM parameter with the path of `/cdn-bucket/`,
 the specific key name will be used for the cdn directory and the value should be the bucket name. For example the ssm param
@@ -45,8 +43,6 @@ The param should be a `SecureString` with a content of stringified JSON using th
   "r2AccessToken": "string",
   "r2AccessKeyId": "string",
   "r2SecretAccessKey": "string",
-  "imagesAccessToken": "string",
-  "imagesAccountHash": "string",
 }
 ```
 

@@ -12,6 +12,4 @@ export type CloudflareR2Secret = {
   r2AccessToken: string
   r2AccessKeyId: string
   r2SecretAccessKey: string
-  imagesAccessToken: string
-  imagesAccountHash: string
 }

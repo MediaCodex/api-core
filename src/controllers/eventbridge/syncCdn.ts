@@ -4,7 +4,6 @@ import {
   S3Client
 } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import middy from '@middy/core'
 import inputOutputLogger from '@middy/input-output-logger'
 import {
@@ -22,14 +21,6 @@ import { tmpdir } from 'os'
 import config from '../../config'
 import { getSecretsManagerSecret } from '../../helpers'
 import { CloudflareR2Secret } from '../../types'
-
-const imageMimeTypes: string[] = [
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'image/svg+xml'
-]
 
 const getPrefix = (bucketName: string): string => {
   for (const [dir, bucket] of Object.entries(config.cdnBucketMap)) {
@@ -103,41 +94,6 @@ const handler: S3NotificationEventBridgeHandler = async (
     }
   })
   await r2Upload.done()
-
-  // upload the object to Cloudflare Images
-  if (imageMimeTypes.includes(s3Object.ContentType ?? '')) {
-    // get temp url ro access r2, both because formData is crap and to reduce AWS bandwidth costs
-    console.info('getting signed url')
-    const signedCommand = new GetObjectCommand({
-      Bucket: config.cdnR2Bucket,
-      Key: targetKey
-    })
-    const signedUrl = await getSignedUrl(r2Client, signedCommand, {
-      expiresIn: 30
-    })
-
-    // tell Images to add new file
-    console.info('uploading file to Cloudflare Images')
-    const formData = new FormData()
-    formData.append('url', signedUrl)
-    formData.append('id', targetKey)
-    const res = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${cloudflareSecret.accountId}/images/v1`,
-      {
-        method: 'POST',
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${cloudflareSecret.imagesAccessToken}`
-        }
-      }
-    )
-    if (!res.ok && res.status !== 409) {
-      if (res.body) console.error(`image upload res`, await res.text())
-      throw new Error(
-        `Failed to upload image to Cloudflare Image (${res.status})`
-      )
-    }
-  }
 
   // tag the object version as synced
   console.log('marking object as synced')
