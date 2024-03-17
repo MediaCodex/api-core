@@ -40,8 +40,14 @@ resource "aws_ssm_parameter" "cognito_endpoint" {
   value = aws_cognito_user_pool.main.endpoint
 }
 
-resource "aws_ssm_parameter" "cognito_client_website" {
-  name  = "/core/cognito-client-website"
+resource "aws_ssm_parameter" "cognito_audiences" {
+  name  = "/core/cognito-audiences"
   type  = "StringList"
   value = join(",", [aws_cognito_user_pool_client.website.id])
+}
+
+resource "aws_ssm_parameter" "cognito_client_website" {
+  name  = "/core/cognito-client-website"
+  type  = "String"
+  value = aws_cognito_user_pool_client.website.id
 }
