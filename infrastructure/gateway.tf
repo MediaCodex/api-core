@@ -1,6 +1,6 @@
 locals {
   # TODO: fix this after the deleted aws accounts have been removed
-  api_domain = local.environment == "dev" ? "devapi.${local.domain}" : "api.${local.domain}"
+  api_domain = "api.${local.domain}"
 }
 
 resource "aws_apigatewayv2_domain_name" "main" {

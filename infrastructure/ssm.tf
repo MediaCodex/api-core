@@ -34,6 +34,12 @@ resource "aws_ssm_parameter" "cognito_password_policy" {
   value = jsonencode(aws_cognito_user_pool.main.password_policy[0])
 }
 
+resource "aws_ssm_parameter" "cognito_endpoint" {
+  name  = "/core/cognito-endpoint"
+  type  = "String"
+  value = aws_cognito_user_pool.main.endpoint
+}
+
 resource "aws_ssm_parameter" "cognito_client_website" {
   name  = "/core/cognito-client-website"
   type  = "StringList"
